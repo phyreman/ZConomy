@@ -1,0 +1,10 @@
+module Base
+{
+    item Money
+    {
+        Weight = 0.0,
+        Type = Normal,
+        DisplayName = Money,
+        Icon = Money,
+    }
+}

@@ -1,0 +1,14 @@
+module ZConomy
+{
+imports {
+    Base
+}
+    recipe Take Money
+    {
+        Wallet/Wallet2/Wallet3/Wallet4,
+
+        Result:Money,
+        Time:15.0,
+        OnCreate:Money_OnLoot,
+    }
+}

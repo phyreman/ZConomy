@@ -1,0 +1,7 @@
+ContextMenu_PT = {
+    ContextMenu_BuyPop = "Comprar refrigerante",
+    ContextMenu_BuySnack = "Comprar lanche",
+    ContextMenu_BreakOpen = "Arrombar",
+    ContextMenu_CheckForChange = "Olhar trocas",
+    ContextMenu_PlayArcadeGame = "Jogar"
+}

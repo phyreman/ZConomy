@@ -2,7 +2,7 @@ module Base
 {
     item Money
     {
-        Weight = 0.0,
+        Weight = 0.05,
         Type = Normal,
         DisplayName = Money,
         Icon = Money,

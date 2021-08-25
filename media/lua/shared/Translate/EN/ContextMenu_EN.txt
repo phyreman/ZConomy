@@ -1,0 +1,7 @@
+ContextMenu_EN = {
+    ContextMenu_BuyPop = "Buy pop",
+    ContextMenu_BuySnack = "Buy snack",
+    ContextMenu_BreakOpen = "Break open",
+    ContextMenu_CheckForChange = "Check for change",
+    ContextMenu_PlayArcadeGame = "Play arcade game"
+}

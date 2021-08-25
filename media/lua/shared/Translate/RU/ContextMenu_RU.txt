@@ -1,0 +1,7 @@
+ContextMenu_RU = {
+    ContextMenu_BuyPop = "Купить газировки",
+    ContextMenu_BuySnack = "Купить чипсы",
+    ContextMenu_BreakOpen = "Взломать",
+    ContextMenu_CheckForChange = "Искать мелочь",
+    ContextMenu_PlayArcadeGame = "Играть в аркадную игру",
+}

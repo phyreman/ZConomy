@@ -1,6 +1,0 @@
-ContextMenu_EN = {
-    ContextMenu_BuyDrink = "Buy drink",
-    ContextMenu_BuySnack = "Buy snack",
-    Contextmenu_BuyPetrol = "Buy gas",
-    ContextMenu_BreakOpen = "Break open"
-}

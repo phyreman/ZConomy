@@ -53,9 +53,13 @@ ZConomy.initContextMenu = function(_player, context, worldobjects)
     -- Skip if machine is empty, otherwise "fill"
     if objectData.ZC_Remaining == nil then
         if objType ~= nil then
-            objectData.ZC_Remaining = ZombRand(config.Options.StockMin,config.Options.StockMax);
+            if objType == "snack" then
+                objectData.ZC_Remaining = ZombRand(config.Options.SnackStockMin,config.Options.SnackStockMax+1);
+            else
+                objectData.ZC_Remaining = ZombRand(config.Options.DrinkStockMin,config.Options.DrinkStockMax+1);
+            end
         elseif objTextureName == "recreational_01" then
-            objectData.ZC_Remaining = tonumber(ZombRand(config.Loot.ArcadeMinBills,config.Loot.ArcadeMaxBills)..'.'..ZombRand(config.Loot.ArcadeMinChange,config.Loot.ArcadeMaxChange));
+            objectData.ZC_Remaining = tonumber(ZombRand(config.Loot.ArcadeMinBills,config.Loot.ArcadeMaxBills+1)..'.'..ZombRand(config.Loot.ArcadeMinChange,config.Loot.ArcadeMaxChange+1));
         else
             objectData.ZC_Remaining = 1;
         end
@@ -128,21 +132,14 @@ ZConomy.checkForChange = function(object, player)
     luautils.walkAdj(player, object:getSquare(), false);
     player:faceThisObject(object);
 
-    local change;
-    local rand = ZombRand(4);
-    if     rand == 0 then change = 0.25
-    elseif rand == 1 then change = 0.50
-    elseif rand == 2 then change = 0.75
-    else change = 1
-    end
-
     -- combine money stacks
     local inventory = player:getInventory();
     local money = inventory:FindAndReturn("Base.Money");
     if (money == nil) then money = inventory:AddItem("Base.Money") end
     local moneyData = money:getModData();
     if (moneyData.amount == nil) then moneyData.amount = "0" end
-    moneyData.amount = string.format("%.2f", tonumber(moneyData.amount) + change);
+    local change = {0.25,0.5,0.75,1};
+    moneyData.amount = string.format("%.2f", tonumber(moneyData.amount) + change[ZombRand(4)+1]);
     moneyData.tooltip = {};
     moneyData.tooltip.amount = moneyData.amount;
 
@@ -165,13 +162,14 @@ ZConomy.purchase = function(player, object, money)
     moneyData.tooltip.amount = moneyData.amount;
 
     -- vend single random item
-    --TODO: Add item vend (ka-thunk) sound; only for player
-    local items = {"Crisps","Crisps2","Crisps3"};
-    if objType == "pop" then
-        -- drink
-        items = {"Pop","Pop2","Pop3","PopBottle"};
+    local items;
+    if objType == "snack" then
+        items = ZConomy.config.Snacks;
+    elseif objType == "pop" then
+        items = ZConomy.config.Drinks;
     end
-    object:getContainer():AddItem("Base."..items[ZombRand(#items)+1]);
+    object:getContainer():AddItem(items[ZombRand(#items)+1]);
+    --TODO: Add item vend (ka-thunk) sound; only for player
     local objectData = object:getModData();
     objectData.ZC_Remaining = objectData.ZC_Remaining - 1;
     object:transmitModData();

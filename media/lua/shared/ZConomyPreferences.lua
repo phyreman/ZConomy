@@ -1,42 +1,65 @@
 ZConomy = {};
 ZConomy.config = {};
+ZConomy.plugin = nil;
 ZConomy._keys = {};
 
 local defaultSettings = {};
+defaultSettings.Snacks = {
+    "Base.Crisps",
+    "Base.Crisps2",
+    "Base.Crisps3"
+};
+defaultSettings.Drinks = {
+    "Base.Pop",
+    "Base.Pop2",
+    "Base.Pop3",
+    "Base.PopBottle"
+};
+-- Prices ending with a zero must be in quotes (i.e. $1.50 = "1.50")
 defaultSettings.Prices = {
     ["Pop"] = "1.50",
     ["Snack"] = 1.25,
-    ["Arcade"] = 0.75,
+    ["Arcade"] = 0.75
 };
 defaultSettings.Options = {
-    ["StockMin"] = 20,
-    ["StockMax"] = 31,
+    ["SnackStockMin"] = 20,
+    ["SnackStockMax"] = 30,
+    ["DrinkStockMin"] = 20,
+    ["DrinkStockMax"] = 30
 };
 defaultSettings.Loot = {
+    -- Wallet Loot
     ["WalletMinBills"] = 1,
     ["WalletMaxBills"] = 9,
     ["WalletMinChange"] = 0,
     ["WalletMaxChange"] = 99,
+    ["WalletChance"] = 2, -- Chance based on PZ-style loot rolls. (PZ default is 1, ZConomy default is 2)
+    -- Purse Loot
     ["PurseMinBills"] = 1,
     ["PurseMaxBills"] = 9,
     ["PurseMinChange"] = 0,
     ["PurseMaxChange"] = 99,
-    ["RegisterMinBills"] = 25,
-    ["RegisterMaxBills"] = 50,
+    ["PurseChance"] = 2, -- Percent chance to spawn a purse on a dead female zombie (only whole numbers)
+    -- Register Loot
+    ["RegisterMinBills"] = 5,
+    ["RegisterMaxBills"] = 20,
     ["RegisterMinChange"] = 0,
     ["RegisterMaxChange"] = 99,
+    -- Payphone Loot
     ["PayphoneMinBills"] = 0,
-    ["PayphoneMaxBills"] = 25,
+    ["PayphoneMaxBills"] = 5,
     ["PayphoneMinChange"] = 0,
     ["PayphoneMaxChange"] = 99,
-    ["ArcadeMinBills"] = 25,
-    ["ArcadeMaxBills"] = 50,
+    -- Arcade Loot
+    ["ArcadeMinBills"] = 10,
+    ["ArcadeMaxBills"] = 25,
     ["ArcadeMinChange"] = 0,
     ["ArcadeMaxChange"] = 99,
-    ["StashMinBills"] = 20,
+    -- Money Stash Loot (under floorboards)
+    ["StashMinBills"] = 25,
     ["StashMaxBills"] = 50,
     ["StashMinChange"] = 50,
-    ["StashMaxChange"] = 99,
+    ["StashMaxChange"] = 99
 };
 ZConomy.log = function(d)
     print("[[ZConomy]]: "..d);

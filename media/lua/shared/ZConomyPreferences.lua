@@ -5,15 +5,15 @@ ZConomy._keys = {};
 
 local defaultSettings = {};
 defaultSettings.Snacks = {
-    "Base.Crisps",
-    "Base.Crisps2",
-    "Base.Crisps3"
+    ["1"] = "Base.Crisps",
+    ["2"] = "Base.Crisps2",
+    ["3"] = "Base.Crisps3"
 };
 defaultSettings.Drinks = {
-    "Base.Pop",
-    "Base.Pop2",
-    "Base.Pop3",
-    "Base.PopBottle"
+    ["1"] = "Base.Pop",
+    ["2"] = "Base.Pop2",
+    ["3"] = "Base.Pop3",
+    ["4"] = "Base.PopBottle"
 };
 -- Prices ending with a zero must be in quotes (i.e. $1.50 = "1.50")
 defaultSettings.Prices = {

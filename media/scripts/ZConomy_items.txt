@@ -6,5 +6,6 @@ module Base
         Type = Normal,
         DisplayName = Money,
         Icon = Money,
+        WorldStaticModel = Money,
     }
 }

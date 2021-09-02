@@ -31,15 +31,17 @@ function ZCPryOpenAction:perform()
     -- Now get the food and run
     if container ~= nil then
         -- default is snack machine
-        local items = {'Crisps','Crisps2','Crisps3'};
+        local items = ZConomy.config.Snacks;
+        local prefix = "Snack";
         if container:getType() == 'vendingpop' then
             -- change the items to drinks if it's a soda machine
-            items = {'Pop','Pop2','Pop3','PopBottle'};
+            items = ZConomy.config.Drinks;
+            prefix = "Drink";
         end
         -- Add 2/3 to 3/4 since some were destroyed while opening the machine
         local objectData = self.object:getModData();
         for i = 0, math.floor(ZombRandFloat(objectData.ZC_Remaining * (2/3), objectData.ZC_Remaining * (3/4))) do
-            container:AddItem('Base.'..items[ZombRand(#items)+1]);
+            container:AddItem(items[prefix..tostring(ZombRand(1,#items+1))]);
         end
         objectData.ZC_Remaining = 0;
         self.object:transmitModData();
@@ -51,23 +53,20 @@ function ZCPryOpenAction:perform()
         local objTextureName = objTexture:sub(0, index-1);
         local objectData = self.object:getModData();
         local money = (self.character:getInventory():FindAndReturn("Base.Money") or self.character:getInventory():AddItem("Base.Money"));
-        local moneyData = money:getModData();
-        local amount = tonumber(moneyData.amount);
+        local amount = 0;
         if objTextureName == "location_shop_accessories_01" and
            ((objTextureID < 5) or
             ((objTextureID > 19) and ((objTextureID < 24)))) then
             -- cash registers
-            amount = amount + tonumber(ZombRand(loot.RegisterMinBills,loot.RegisterMaxBills+1) .. '.' .. ZombRand(loot.RegisterMinChange,loot.RegisterMaxChange+1));
+            amount = tonumber(ZombRand(loot.RegisterMinBills,loot.RegisterMaxBills+1) .. '.' .. ZombRand(loot.RegisterMinChange,loot.RegisterMaxChange+1));
         elseif objTextureName == "street_decoration_01" then
             -- payphones
-            amount = amount + tonumber(ZombRand(loot.PayphoneMinBills,loot.PayphoneMaxBills+1) .. '.' .. ZombRand(loot.PayphoneMinChange,loot.PayphoneMaxChange+1));
+            amount = tonumber(ZombRand(loot.PayphoneMinBills,loot.PayphoneMaxBills+1) .. '.' .. ZombRand(loot.PayphoneMinChange,loot.PayphoneMaxChange+1));
         elseif objTextureName == "recreational_01" then
             -- arcade machines
-            amount = amount + objectData.ZC_Remaining;
+            amount = objectData.ZC_Remaining;
         end
-        moneyData.amount = string.format("%.2f", amount);
-        moneyData.tooltip = {};
-        moneyData.tooltip.amount = moneyData.amount;
+        ZConomy.addToMoney(money, amount);
 
         objectData.ZC_Remaining = 0;
         self.object:transmitModData();

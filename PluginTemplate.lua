@@ -11,23 +11,22 @@ function OnPurchase(player, clickedObject, money)
     -- Turn player towards machine to face it
     player:faceThisObject(object);
 
-    -- Get the amount of money the player currently has in inventory
-    local moneyData = money:getModData();
-    -- Type of machine ("snack" and "pop" are the only current options)
     local objType = object:getContainer():getType():gsub("vending", "");
-    -- Remove the amount from the player
-    moneyData.amount = string.format("%.2f", tonumber(moneyData.amount) - ZConomy.config.Prices[objType:gsub("^%l", string.upper)]);
-    moneyData.tooltip.amount = moneyData.amount;
+    -- Charge money
+    ZConomy.addToMoney(money, -tonumber(ZConomy.config.Prices[objType:gsub("^%l", string.upper)]));
 
     -- Pick list of items depending on type of machine
     local items;
+    local prefix;
     if objType == "snack" then
         items = ZConomy.config.Snacks;
+        prefix = "Snack";
     elseif objType == "pop" then
         items = ZConomy.config.Drinks;
+        prefix = "Drink";
     end
     -- Add item to machine
-    object:getContainer():AddItem(items[ZombRand(#items)+1]);
+    object:getContainer():AddItem(items[prefix..tostring(ZombRand(1, table.length(items)+1))]);
     local objectData = object:getModData();
     -- Reduce number of remaining vends
     objectData.ZC_Remaining = objectData.ZC_Remaining - 1;
@@ -43,16 +42,12 @@ function OnLootWallet(inputItems, result, player)
     local loot = ZConomy.config.Loot;
     if not inv:contains("Money") then
         -- Set amount for money in player's inventory
-        resultData.amount = string.format("%.2f", ZombRand(loot.WalletMinBills,loot.WalletMaxBills+1) .. "." .. ZombRand(loot.WalletMinChange,loot.WalletMaxChange+1));
-        resultData.tooltip = {};
-        resultData.tooltip.amount = resultData.amount;
+        ZConomy.updateMoney(result, ZombRand(loot.WalletMinBills,loot.WalletMaxBills+1) .. "." .. ZombRand(loot.WalletMinChange,loot.WalletMaxChange+1));
     else
         -- Add amounts and set it for the new money object
         local money = inv:FindAndReturn("Base.Money");
         local moneyData = money:getModData();
-        resultData.amount = string.format("%.2f", tonumber(moneyData.amount) + tonumber(ZombRand(loot.WalletMinBills,loot.WalletMaxBills+1) .. '.' .. ZombRand(loot.WalletMinChange,loot.WalletMaxChange+1)));
-        resultData.tooltip = {};
-        resultData.tooltip.amount = resultData.amount;
+        ZConomy.updateMoney(result, tonumber(moneyData.amount) + tonumber(ZombRand(loot.WalletMinBills,loot.WalletMaxBills+1) .. '.' .. ZombRand(loot.WalletMinChange,loot.WalletMaxChange+1)));
         -- Remove the old money object so we don't have two in the inventory
         inv:Remove(money);
     end
@@ -87,16 +82,10 @@ function OnCheckForChange(object, inventory)
 
     -- Look in player's inventory for money and add it if not there
     local inventory = player:getInventory();
-    local money = inventory:FindAndReturn("Base.Money");
-    if (money == nil) then money = inventory:AddItem("Base.Money") end
-    local moneyData = money:getModData();
-    -- If it's a new stack (not already in the player's inventory) then set the amount to zero
-    if (moneyData.amount == nil) then moneyData.amount = "0" end
+    local money = inventory:FindAndReturn("Base.Money") or inventory:AddItem("Base.Money");
     local change = {0.25,0.5,0.75,1};
     -- Randomly choose an amount of change to give when looking in coin slots of machines
-    moneyData.amount = string.format("%.2f", tonumber(moneyData.amount) + change[ZombRand(4)+1]);
-    moneyData.tooltip = {};
-    moneyData.tooltip.amount = moneyData.amount;
+    ZConomy.addToMoney(money, change[ZombRand(1,5)]);
     -- Mark the machine so it can't be looted again
     object:getModData().ZC_Looted = true;
     -- Send data to server (required for multiplayer)

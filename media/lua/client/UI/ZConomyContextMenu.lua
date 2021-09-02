@@ -12,7 +12,7 @@ ZConomy.initContextMenu = function(_player, context, worldobjects)
     -- location_shop_accessories_01_[8,9,12,13] = soda fountain
     -- location_shop_accessories_01_[16,17] = snack machine
     -- location_shop_accessories_01_[18,19] = soda machine
-    -- recreational_01_[16-23] = arcade machines
+    -- recreational_01_[16-24] = arcade machines
     -- street_decoration_01_[38,39] = payphones
 
     function validObject()
@@ -28,9 +28,10 @@ ZConomy.initContextMenu = function(_player, context, worldobjects)
                     (objTextureID > 37 and objTextureID < 40)
                 ) or
                 (objTextureName == "recreational_01" and
-                    (objTextureID > 15 and objTextureID < 24)
+                    (objTextureID > 15 and objTextureID < 25)
                 )
             ) then return true end
+        --print("Unwatched Texture: " .. objTexture);
         return false;
     end
     
@@ -132,16 +133,11 @@ ZConomy.checkForChange = function(object, player)
     luautils.walkAdj(player, object:getSquare(), false);
     player:faceThisObject(object);
 
-    -- combine money stacks
+    -- Combine money stacks
     local inventory = player:getInventory();
-    local money = inventory:FindAndReturn("Base.Money");
-    if (money == nil) then money = inventory:AddItem("Base.Money") end
-    local moneyData = money:getModData();
-    if (moneyData.amount == nil) then moneyData.amount = "0" end
+    local money = inventory:FindAndReturn("Base.Money") or inventory:AddItem("Base.Money");
     local change = {0.25,0.5,0.75,1};
-    moneyData.amount = string.format("%.2f", tonumber(moneyData.amount) + change[ZombRand(4)+1]);
-    moneyData.tooltip = {};
-    moneyData.tooltip.amount = moneyData.amount;
+    ZConomy.addToMoney(money, change[ZombRand(1,5)]);
 
     object:getModData().ZC_Looted = true;
     object:transmitModData();
@@ -155,20 +151,21 @@ ZConomy.purchase = function(player, object, money)
     luautils.walkAdj(player, object:getSquare(), false);
     player:faceThisObject(object);
 
-    local moneyData = money:getModData();
     local objType = object:getContainer():getType():gsub("vending", "");
-    -- charge money
-    moneyData.amount = string.format("%.2f", tonumber(moneyData.amount) - ZConomy.config.Prices[objType:gsub("^%l", string.upper)]);
-    moneyData.tooltip.amount = moneyData.amount;
+    -- Charge money
+    ZConomy.addToMoney(money, -tonumber(ZConomy.config.Prices[objType:gsub("^%l", string.upper)]));
 
-    -- vend single random item
+    -- Vend single random item
     local items;
+    local prefix;
     if objType == "snack" then
         items = ZConomy.config.Snacks;
+        prefix = "Snack";
     elseif objType == "pop" then
         items = ZConomy.config.Drinks;
+        prefix = "Drink";
     end
-    object:getContainer():AddItem(items[ZombRand(#items)+1]);
+    object:getContainer():AddItem(items[prefix..tostring(ZombRand(1, table.length(items)+1))]);
     --TODO: Add item vend (ka-thunk) sound; only for player
     local objectData = object:getModData();
     objectData.ZC_Remaining = objectData.ZC_Remaining - 1;
@@ -193,18 +190,18 @@ ZConomy.manageInventory = function(srcContainer, destContainer, character)
     local stacks = destContainer:FindAll("Money");
     if stacks:size() < 2 then return end
 
+    -- Get amount of first money object
     local amount = tonumber(stacks:get(0):getModData().amount);
-    local tempAmount;
+    -- Then add the value of each other object to the original
     for i = 1, stacks:size() - 1 do
-        tempAmount = tonumber(stacks:get(i):getModData().amount);
-        amount = amount + tempAmount;
+        amount = amount + tonumber(stacks:get(i):getModData().amount);
     end
+    -- Remove all money objects from the destination container (player inventory, usually)
     destContainer:RemoveAll("Money");
 
-    local moneyData = destContainer:AddItem("Base.Money"):getModData();
-    moneyData.amount = string.format("%.2f", amount);
-    moneyData.tooltip = {};
-    moneyData.tooltip.amount = moneyData.amount;
+    -- Then create a new money object and set the amount to the total of the previous ones
+    local money = destContainer:AddItem("Base.Money");
+    ZConomy.updateMoney(money, amount);
 end
 
 Events.OnPreFillWorldObjectContextMenu.Add(ZConomy.initContextMenu);

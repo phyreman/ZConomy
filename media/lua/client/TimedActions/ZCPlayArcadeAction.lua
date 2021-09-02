@@ -12,27 +12,25 @@ function ZCPlayArcadeAction:update()
         self.tick = 0;
         local bodyDamage = self.character:getBodyDamage();
         -- Change mood
-        bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - 2);
-        bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - 2);
-        addSound(self.character, self.character:getX(), self.character:getY(), self.character:getZ(), 15, 15);
+        bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - ZConomy.config.Options["ArcadeBoredomRate"]);
+        bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - ZConomy.config.Options["ArcadeUnhappyRate"]);
+        addSound(self.character, self.character:getX(), self.character:getY(), self.character:getZ(), 10, 10);
     end
 end
 
 function ZCPlayArcadeAction:start()
     self.character:faceThisObject(self.object);
-    local moneyData = self.money:getModData();
-    -- charge money
-    moneyData.amount = string.format("%.2f", tonumber(moneyData.amount) - ZConomy.config.Prices["Arcade"]);
-    moneyData.tooltip.amount = moneyData.amount;
+    -- Charge money
+    ZConomy.addToMoney(self.money, -tonumber(ZConomy.config.Prices["Arcade"]));
 
     -- Add the money to the machine's total
     local objectData = self.object:getModData();
-    objectData.ZC_Remaining = objectData.ZC_Remaining + ZConomy.config.Prices["Arcade"];
+    objectData.ZC_Remaining = objectData.ZC_Remaining + tonumber(ZConomy.config.Prices["Arcade"]);
     self.object:transmitModData();
     
     --TODO: Add arcade noises, perhaps even different types
     -- getSoundManager():PlayWorldSoundWav('ZC_ArcadeMachine', self.character:getCurrentSquare(), 1, 20, 1, false);
-    addSound(self.character, self.character:getX(), self.character:getY(), self.character:getZ(), 15, 15);
+    addSound(self.character, self.character:getX(), self.character:getY(), self.character:getZ(), 10, 10);
 end
 
 function ZCPlayArcadeAction:stop()

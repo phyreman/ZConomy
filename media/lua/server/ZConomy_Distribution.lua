@@ -24,12 +24,8 @@ function ZCAddMoney(roomName, containerType, container)
     if containerType == "cashregister" then
         local stacks = container:FindAll('Money');
         local loot = ZConomy.config.Loot;
-        local moneyData = nil;
         for i = 0, stacks:size()-1 do
-            moneyData = stacks:get(i):getModData();
-            moneyData.amount = ZombRand(loot.StashMinBills, loot.StashMaxBills+1) .. '.' .. ZombRand(loot.StashMinChange, loot.StashMaxChange+1);
-            moneyData.tooltip = {};
-            moneyData.tooltip.amount = moneyData.amount;
+            ZConomy.updateMoney(stacks:get(i), ZombRand(loot.RegisterMinBills, loot.RegisterMaxBills+1) .. '.' .. ZombRand(loot.RegisterMinChange, loot.RegisterMaxChange+1));
         end
     end
 end
@@ -53,7 +49,7 @@ function ZCZombieDead(zombie)
     local rolls = {};
     local rand;
     -- Roll (0 < $chance < 100) number of times and store the numbers
-    while len(rolls) < chance do
+    while table.length(rolls) < chance do
         rand = ZombRand(100); -- 0-99
         if not contains(rolls, rand) then
             table.insert(rolls, rand);
@@ -62,13 +58,9 @@ function ZCZombieDead(zombie)
     -- Roll a random number
     if not contains(rolls, ZombRand(100)) then return end
 
-    local inv = zombie:getInventory();
-    local purse = inv:AddItem("Purse");
+    local purse = zombie:getInventory():AddItem("Purse");
     local money = purse:getItemContainer():AddItem("Money");
-    local moneyData = money:getModData();
-    moneyData.amount = ZombRand(loot.PurseMinBills, loot.PurseMaxBills+1) .. '.' .. ZombRand(loot.PurseMinChange, loot.PurseMaxChange+1);
-    moneyData.tooltip = {};
-    moneyData.tooltip.amount = moneyData.amount;
+    ZConomy.updateMoney(money, ZombRand(loot.PurseMinBills, loot.PurseMaxBills+1) .. '.' .. ZombRand(loot.PurseMinChange, loot.PurseMaxChange+1));
 end
 
 Events.OnFillContainer.Add(ZCAddMoney);

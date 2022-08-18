@@ -4,4 +4,6 @@ ContextMenu_RU = {
     ContextMenu_BreakOpen = "Взломать",
     ContextMenu_CheckForChange = "Искать мелочь",
     ContextMenu_PlayArcadeGame = "Играть в аркадную игру",
+    ContextMenu_SplitStack = "Split Stack",
+    ContextMenu_Split_Stack = "%1/%2 (%1)"
 }

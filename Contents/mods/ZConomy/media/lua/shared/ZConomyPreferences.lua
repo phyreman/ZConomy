@@ -1,6 +1,6 @@
 ZConomy = {};
 ZConomy.config = {};
-ZConomy.plugin = nil;
+ZConomy.debug = getCore():getDebug();
 ZConomy._keys = {};
 
 local defaultSettings = {};
@@ -27,8 +27,10 @@ defaultSettings.Options = {
     ["SnackStockMax"] = 270,
     ["DrinkStockMin"] = 30,
     ["DrinkStockMax"] = 270,
-    ["ArcadeBoredomRate"] = 2,
-    ["ArcadeUnhappyRate"] = 2
+    ["ArcadeBoredomRate"] = "0.5",
+    ["ArcadeUnhappyRate"] = "0.5",
+    ["ArcadeStressRate"] = "0.5",
+    ["ScaleMoneyWeight"] = true
 };
 defaultSettings.Loot = {
     -- Wallet Loot
@@ -59,10 +61,15 @@ defaultSettings.Loot = {
     ["ArcadeMinChange"] = 0,
     ["ArcadeMaxChange"] = 99,
     -- Money Stash Loot (under floorboards)
-    --["StashMinBills"] = 25,
-    --["StashMaxBills"] = 50,
-    --["StashMinChange"] = 50,
-    --["StashMaxChange"] = 99
+    ["StashMinBills"] = 25,
+    ["StashMaxBills"] = 50,
+    ["StashMinChange"] = 50,
+    ["StashMaxChange"] = 99
+    -- ATM Loot
+    -- ["AutoTellerMachineMinBills"] = 100,
+    -- ["AutoTellerMachineMaxBills"] = 2000,
+    -- ["AutoTellerMachineMinChange"] = 0,
+    -- ["AutoTellerMachineMaxChange"] = 0
 };
 ZConomy.log = function(d)
     print("[[ZConomy]]: "..d);
@@ -90,29 +97,41 @@ end
 
 ZConomy.addToMoney = function(money, amount)
     local moneyData = money:getModData();
-    -- Convert amount to a number if it isn't one already
-    if type(amount) ~= "number" then
-        amount = tonumber(amount);
-    end
     -- Simply set the amount if
     if moneyData.amount == nil then
         moneyData.amount = 0;
     end
-    moneyData.amount = string.format("%.2f", tonumber(moneyData.amount) + amount);
+    -- Convert amount to a number if it isn't one already
+    if type(amount) ~= "number" then
+        amount = tonumber(amount);
+    end
+    moneyData.amount = round(tonumber(moneyData.amount) + amount);
     if moneyData.tooltip == nil then
         moneyData.tooltip = {};
     end
     moneyData.tooltip.amount = moneyData.amount;
+    -- Scale the weight of a money stack depending on the amount of money held
+    if ZConomy.config.Options["ScaleMoneyWeight"] == "true" then
+        money:setActualWeight(math.max(0.01, (moneyData.amount / 0.01) * 0.0005));
+        money:setCustomWeight(true);
+    end
 end
 
 ZConomy.updateMoney = function(money, amount)
     local moneyData = money:getModData();
     -- Convert amount to a number if it isn't one already
-    moneyData.amount = string.format("%.2f", amount);
+    if type(amount) ~= "number" then
+        amount = tonumber(amount);
+    end
+    moneyData.amount = round(amount);
     if moneyData.tooltip == nil then
         moneyData.tooltip = {};
     end
     moneyData.tooltip.amount = moneyData.amount;
+    if ZConomy.config.Options["ScaleMoneyWeight"] == "true" then
+        money:setActualWeight(math.max(0.01, (moneyData.amount / 0.01) * 0.0005));
+        money:setCustomWeight(true);
+    end
 end
 
 -- Helper function to get the length of a table
@@ -157,21 +176,8 @@ end
 
 defaultSettings = nil;
 
-ZConomy.hook = function(plugin)
-    local id = plugin.id;
-    -- plugin must be a table with plugin.id being the name of the hooked mod
-    if assert(id ~= nil, "[[ZConomy]] - ERROR: Unknown mod attempted to request override permissions. ID key is missing or empty.") then
-        if assert(isModActive(id), "[[ZConomy]] - ERROR: '"..id.."' is not enabled.") then
-            ZConomy.plugin = plugin;
-            ZConomy.log(id .. " has successfully been given override access.");
-        end
-    end
-end
-
 -- *** Register Events ***
 LuaEventManager.AddEvent("OnTransferInventoryItem");
-LuaEventManager.AddEvent("OnZConomyPluginRequest");
 LuaEventManager.AddEvent("OnZConomySettingsLoaded");
 
-Events.OnZConomyPluginRequest.Add(ZConomy.hook);
 triggerEvent("OnZConomySettingsLoaded");

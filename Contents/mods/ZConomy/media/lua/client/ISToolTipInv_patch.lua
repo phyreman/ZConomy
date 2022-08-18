@@ -58,9 +58,10 @@ function ISToolTipInv:render()
             th = th + (lh * len(itemData.tooltip));
         end
     end
+    
+    self:setHeight(th + 5);
     -- END PATCH
-    self:setHeight(th);
-
+    
     if self.followMouse then
         self:adjustPositionToAvoidOverlap({ x = mx - 24 * 2, y = my - 24 * 2, width = 24 * 2, height = 24 * 2 })
     end
@@ -68,21 +69,29 @@ function ISToolTipInv:render()
     self:drawRect(0, 0, self.width, self.height, self.backgroundColor.a, self.backgroundColor.r, self.backgroundColor.g, self.backgroundColor.b);
     self:drawRectBorder(0, 0, self.width, self.height, self.borderColor.a, self.borderColor.r, self.borderColor.g, self.borderColor.b);
     -- START PATCH
-        if itemData ~= nil and itemData.tooltip ~= nil then
-            -- local x = 5;
-            local count = 1;
-            local label;
-            local ty;
-            for key,value in pairs(itemData.tooltip) do
-                ty = 25 + (lh * count);
-                label = key:gsub('^%l', string.upper) .. ':';
-                self.tooltip:DrawText(label, 5, ty, 1,1,0.8,1);
-                -- [x = ] pad + 40 + getTextManager():MeasureStringX(UIFont.Small, label)
-                self.tooltip:DrawText(value, (self.width / 2) + 12, ty, 1,1,1,1);
-                count = count + 1;
-            end
+    if itemData ~= nil and itemData.tooltip ~= nil then
+        -- local x = 5;
+        local count = 0;
+        local label;
+        local ty;
+        th = th - (lh * len(itemData.tooltip));
+        -- if self.item.weight == self.item:getWeightOfStack() then
+        --     local stackAmount = 0;
+        --     self.tooltip:DrawText("Stack Amount:", 5, th, 1,1,0.8,1);
+        --     self.tooltip:DrawText(stackAmount, (self.width / 2) + 12, th, 1,1,1,1);
+        --     th = th + lh;
+        --     count = count + 1;
+        -- end
+        for key,value in pairs(itemData.tooltip) do
+            ty = th + (lh * count);
+            label = key:gsub('^%l', string.upper) .. ':';
+            self.tooltip:DrawText(label, 5, ty, 1,1,0.8,1);
+            -- [x = ] pad + 40 + getTextManager():MeasureStringX(UIFont.Small, label)
+            self.tooltip:DrawText(value, (self.width / 2) + 12, ty, 1,1,1,1);
+            count = count + 1;
         end
-        -- END PATCH
+    end
+    -- END PATCH
     self.item:DoTooltip(self.tooltip);
     end
 end

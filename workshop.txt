@@ -1,0 +1,38 @@
+version=1
+id=1660388043
+title=ZConomy
+description=[h1]Main Features[/h1]
+description=[list]
+description=[*]Adds right-click option to destroy Wallets for Money, as well as loot it from Purses
+description=[*]Check Payphones, Arcade Cabinets, and Vending Machines for spare change
+description=[*]Break open Payphones, Cash Registers, and Arcade Cabinets for large sums of Money with a Crowbar (*Tip: User Geronimo suggests clicking the checkout price display that sticks out from the top of the register, as it seems to work reliably.)
+description=[*]Use the Money you've found to buy chips or soda from various vending machines. Grab them before the Zeds come!
+description=[*]Spend some time playing an Arcade machine as a cheap, renewable way to relieve some boredom and unhappyness
+description=[*]Use a Crowbar to break open the vending machines, but destroy some of the products inside. Don't forget to grab the cash, too!
+description=[*]Using a Crowbar is very loud! Be careful of nearby zombies, or you might end up as a snack yourself!
+description=[*]Completely configurable prices and loot amounts for all machines. Just look for the ZConomy.ini file in your <user>/Zomboid/Lua/ folder.
+description=[*]Money can be split into other stacks by a percentage. (i.e. Right-click -> "Split Stack" -> "50/50 (50%)")
+description=[*]Now compatible with existing saves! Just move the Money from one container to another. That's it!
+description=[/list]
+description=
+description=[h1]Translations[/h1]
+description=This project is currently available in English, Português, and Русский. Community translations gladly accepted! Here are the English variants:
+description=[code]ContextMenu_EN = {
+description=    ContextMenu_BuyPop = "Buy pop",
+description=    ContextMenu_BuySnack = "Buy snack",
+description=    ContextMenu_BreakOpen = "Break open",
+description=    ContextMenu_CheckForChange = "Check for change",
+description=    ContextMenu_PlayArcadeGame = "Play arcade game",
+description=    ContextMenu_SplitStack = "Split Stack",
+description=    ContextMenu_Split_Stack = "%1/%2 (%1)"
+description=}[/code]
+description=
+description=[h1]Known Issues[/h1]
+description=[list]
+description=[*]None at the moment. Cash Registers seem to be a bit easier to target after the 41.73 update, but please report any problems you get.
+description=[/list]
+description=
+description=[h1]Permissions[/h1]
+description=Credit Where Due
+tags=Build 41.73;Food;Items;Multiplayer
+visibility=public

@@ -3,7 +3,7 @@
 -- by RoboMat
 --
 -- Created: 30.01.14 - 16:59
--- modified by Valrix 01.06.15 - 23:38
+-- modified by Valrix 16.09.21 - 15:34
 -- =============================================================================
 
 -- ------------------------------------------------
@@ -73,7 +73,7 @@ function IniIO.readIni(_path, _createIfNil)
                 assert(file[section], "ERROR: No global properties allowed. There has to be a section declaration first.");
 
                 -- Split the key from the value.
-                local key,value = string.gmatch(line, "(%w+)=(%S*)")();
+                local key,value = string.gmatch(line, "(.*)=(.*)")();
                 key = IniIO.trim(key);
                 value = IniIO.trim(value);
                 -- convert strings to numbers now for convenience

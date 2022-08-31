@@ -1,0 +1,42 @@
+module Base
+{
+	item WalletEmpty
+	{
+		DisplayCategory 	= Junk,
+		Weight				= 0.2,
+		Type				= Normal,
+		DisplayName			= Empty Wallet,
+		Icon				= Wallet_01,
+		WorldStaticModel	= Wallet,
+	}
+
+	item Wallet2Empty
+	{
+		DisplayCategory 	= Junk,
+		Weight				= 0.2,
+		Type				= Normal,
+		DisplayName			= Empty Wallet,
+		Icon				= Wallet_02,
+		WorldStaticModel	= Wallet2,
+	}
+
+	item Wallet3Empty
+	{
+		DisplayCategory 	= Junk,
+		Weight				= 0.2,
+		Type				= Normal,
+		DisplayName			= Empty Wallet,
+		Icon				= Wallet_03,
+		WorldStaticModel	= Wallet3,
+	}
+
+	item Wallet4Empty
+	{
+		DisplayCategory 	= Junk,
+		Weight				= 0.2,
+		Type				= Normal,
+		DisplayName			= Empty Wallet,
+		Icon				= Wallet_04,
+		WorldStaticModel	= Wallet4,
+	}
+}

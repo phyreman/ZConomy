@@ -76,59 +76,59 @@ ZConomy.log = function(d)
 end
 
 ZConomy.addDrinks = function(drinks)
+    local idx = table.length(ZConomy.config.Drinks);
     if type(drinks) == "table" then
         for i = 1,table.length(drinks) do
-            ZConomy.config.Drinks["Drink" .. table.length(ZConomy.config.Drinks)+1] = drinks[i];
+            ZConomy.config.Drinks["Drink" .. idx+i] = drinks[i];
         end
     else
-        ZConomy.config.Drinks["Drink" .. table.length(ZConomy.config.Drinks)+1] = drinks;
+        ZConomy.config.Drinks["Drink" .. idx+1] = drinks;
     end
 end
 
 ZConomy.addSnacks = function(snacks)
+    local idx = table.length(ZConomy.config.Snacks);
     if type(snacks) == "table" then
         for i = 1,table.length(snacks) do
-            ZConomy.config.Snacks["Snack" .. table.length(ZConomy.config.Snacks)+1] = snacks[i];
+            ZConomy.config.Snacks["Snack" .. idx+i] = snacks[i];
         end
     else
-        ZConomy.config.Snacks["Snack" .. table.length(ZConomy.config.Snacks)+1] = snacks;
+        ZConomy.config.Snacks["Snack" .. idx+1] = snacks;
     end
+end
+
+ZConomy.addToLoot = function(obj, amount)
+    local objectData = obj:getModData();
+    objectData.ZConomy.loot = round(objectData.ZConomy.loot + amount, 2);
+    obj:transmitModData();
 end
 
 ZConomy.addToMoney = function(money, amount)
     local moneyData = money:getModData();
-    -- Simply set the amount if
     if moneyData.amount == nil then
         moneyData.amount = 0;
     end
-    -- Convert amount to a number if it isn't one already
-    if type(amount) ~= "number" then
-        amount = tonumber(amount);
-    end
-    moneyData.amount = round(tonumber(moneyData.amount) + amount);
+    amount = round(moneyData.amount + amount, 2);
+    moneyData.amount = amount;
     if moneyData.tooltip == nil then
         moneyData.tooltip = {};
     end
-    moneyData.tooltip.amount = moneyData.amount;
+    moneyData.tooltip.amount = amount;
     -- Scale the weight of a money stack depending on the amount of money held
-    if ZConomy.config.Options["ScaleMoneyWeight"] == "true" then
-        money:setActualWeight(math.max(0.01, (moneyData.amount / 0.01) * 0.0005));
+    if ZConomy.config.Options.ScaleMoneyWeight == "true" then
+        money:setActualWeight(math.max(0.01, (amount / 0.01) * 0.0005));
         money:setCustomWeight(true);
     end
 end
 
 ZConomy.updateMoney = function(money, amount)
     local moneyData = money:getModData();
-    -- Convert amount to a number if it isn't one already
-    if type(amount) ~= "number" then
-        amount = tonumber(amount);
-    end
-    moneyData.amount = round(amount);
+    moneyData.amount = round(amount, 2);
     if moneyData.tooltip == nil then
         moneyData.tooltip = {};
     end
     moneyData.tooltip.amount = moneyData.amount;
-    if ZConomy.config.Options["ScaleMoneyWeight"] == "true" then
+    if ZConomy.config.Options.ScaleMoneyWeight == "true" then
         money:setActualWeight(math.max(0.01, (moneyData.amount / 0.01) * 0.0005));
         money:setCustomWeight(true);
     end

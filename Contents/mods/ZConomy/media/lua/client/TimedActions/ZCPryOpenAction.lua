@@ -13,7 +13,7 @@ end
 function ZCPryOpenAction:start()
     local player = self.character;
     local obj = self.object;
-    getSoundManager():PlayWorldSoundWav("ZC_PryMachine", obj:getCurrentSquare(), 0, 15, 1, true);
+    player:getSquare():playSound("PryOpenMachine");
     addSound(player, self.x, self.y, self.z, 50, 15);
 end
 
@@ -29,22 +29,21 @@ function ZCPryOpenAction:perform()
     addSound(self.character, self.x, self.y, self.z, 50, 30);
 
     -- Now get the food and run
-    if container ~= nil then
+    if self.flags.isVendingMachine then
         -- default is snack machine
-        local items = ZConomy.config.Snacks;
         local prefix = "Snack";
         if container:getType() == "vendingpop" then
             -- change the items to drinks if it's a soda machine
-            items = ZConomy.config.Drinks;
             prefix = "Drink";
         end
+        local items = ZConomy.config[prefix.."s"]
         -- Add 2/3 to 3/4 since some were destroyed while opening the machine
         local objectData = self.object:getModData();
         for i = 0, math.floor(ZombRandFloat(objectData.ZConomy.stock * (2/3), objectData.ZConomy.stock * (3/4))) do
             container:AddItem(items[prefix..tostring(ZombRand(1,#items+1))]);
         end
-        ZConomy.addToMoney(container:AddItem("Base.Money"), objectData.ZConomy.loot);
         objectData.ZConomy.stock = 0;
+        ZConomy.addToMoney(container:AddItem("Base.Money"), objectData.ZConomy.loot);
         objectData.ZConomy.loot = 0;
         self.object:transmitModData();
     else
@@ -56,9 +55,7 @@ function ZCPryOpenAction:perform()
         local objectData = self.object:getModData();
         local money = (self.character:getInventory():FindAndReturn("Base.Money") or self.character:getInventory():AddItem("Base.Money"));
         local amount = 0;
-        if self.flags.isCashRegister then
-            amount = tonumber(ZombRand(loot.RegisterMinBills, loot.RegisterMaxBills+1) .. "." .. ZombRand(loot.RegisterMinChange, loot.RegisterMaxChange+1));
-        elseif self.flags.isPayphone then
+        if self.flags.isPayphone then
             amount = tonumber(ZombRand(loot.PayphoneMinBills, loot.PayphoneMaxBills+1) .. "." .. ZombRand(loot.PayphoneMinChange, loot.PayphoneMaxChange+1));
         elseif self.flags.isArcadeMachine then
             amount = objectData.ZConomy.loot;

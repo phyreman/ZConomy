@@ -42,7 +42,7 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 
 	local isVendingMachine = false;
 	local isArcadeMachine = false;
-	local isCashRegister = false;
+	-- local isCashRegister = false;
 	local isPayphone = false;
 	-- local isSafe = false;
 	-- local isATM = false;
@@ -52,10 +52,10 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 	end
 
 	if (objTexture ~= nil) then
-		if objTextureName == "location_shop_accessories_01" then
-			if (objTextureID < 5) or (objTextureID > 19 and objTextureID < 24) then
-				isCashRegister = true;
-			end
+		-- if objTextureName == "location_shop_accessories_01" then
+		-- 	if (objTextureID < 5) or (objTextureID > 19 and objTextureID < 24) then
+		-- 		isCashRegister = true;
+		-- 	end
 		-- elseif objTextureName == "location_business_bank_01" then
 			-- if objTextureID > 63 and objTextureID < 68 then
 			-- 	isATM = true;
@@ -63,7 +63,7 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 			-- if objTextureID > 68 and objTextureID < 70 then
 			-- 	isSafe = true;
 			-- end
-		elseif objTextureName == "street_decoration_01" then
+		if objTextureName == "street_decoration_01" then
 			if objTextureID > 37 and objTextureID < 40 then
 				isPayphone = true;
 			end
@@ -74,7 +74,7 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 		end
 	end
 
-	if not (isVendingMachine or isArcadeMachine or isCashRegister or isPayphone--[[ or isSafe or isATM--]]) then
+	if not (isVendingMachine or isArcadeMachine or isPayphone--[[ or isCashRegister or isSafe or isATM--]]) then
 		if ZConomy.debug then
 			print("--------------------");
 			print("Unwatched Texture: " .. objTexture);
@@ -105,11 +105,8 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 	end
 
 	if isVendingMachine and objectData.ZConomy.stock == nil then
-		if objType == "snack" then
-			objectData.ZConomy.stock = ZombRand(config.Options.SnackStockMin, config.Options.SnackStockMax+1);
-		else
-			objectData.ZConomy.stock = ZombRand(config.Options.DrinkStockMin, config.Options.DrinkStockMax+1);
-		end
+		local type = objType:gsub("^%l", string.upper);
+		objectData.ZConomy.stock = ZombRand(config.Options[type.."StockMin"], config.Options[type.."StockMax"]+1);
 		object:transmitModData();
 	end
 
@@ -121,14 +118,10 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 		elseif isPayphone then
 			loot = tonumber(ZombRand(config.Loot.PayphoneMinBills, config.Loot.PayphoneMaxBills+1) .. "." .. ZombRand(config.Loot.PayphoneMinChange, config.Loot.PayphoneMaxChange+1));
 		elseif isVendingMachine then
-			if objType == "snack" then
-				loot = (300 - objectData.ZConomy.stock) * config.Prices.Snack;
-			else
-				loot = (300 - objectData.ZConomy.stock) * config.Prices.Pop;
-			end
+			loot = (300 - objectData.ZConomy.stock) * tonumber(config.Prices[objType:gsub("^%l", string.upper)]);
 		end
 		if loot ~= nil then
-			objectData.ZConomy.loot = loot;
+			ZConomy.addToLoot(objectData.ZConomy.loot, loot);
 			object:transmitModData();
 		end
 	end
@@ -139,7 +132,7 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 	if inventory:containsTypeRecurse("Crowbar") then
 		-- break door open; make noise, spawn some items
 		local flags = {};
-		flags.isCashRegister = isCashRegister;
+		-- flags.isCashRegister = isCashRegister;
 		flags.isPayphone = isPayphone;
 		flags.isArcadeMachine = isArcadeMachine;
 		flags.isVendingMachine = isVendingMachine;
@@ -166,7 +159,7 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 	-- OR allow the player to spend money at the arcades to entertain themselves
 	elseif isArcadeMachine then
 		-- check if there's enough money to play
-		if config.Prices["Arcade"] <= tonumber(moneyData.amount) then
+		if config.Prices.Arcade <= tonumber(moneyData.amount) then
 			context:addOption(getText("ContextMenu_PlayArcadeGame"), player, ZConomy.playArcadeGame, object, money);
 		end
 	end
@@ -219,78 +212,18 @@ ZConomy.purchase = function(player, object, money)
 	ZConomy.addToMoney(money, -itemPrice);
 
 	-- Vend single random item
-	local items;
-	local prefix;
-	if objType == "snack" then
-		items = ZConomy.config.Snacks;
-		prefix = "Snack";
-	elseif objType == "pop" then
-		items = ZConomy.config.Drinks;
+	local prefix = "Snack";
+	if objType == "pop" then
 		prefix = "Drink";
 	end
+	local items = ZConomy.config[prefix.."s"]
 	object:getContainer():AddItem(items[prefix..tostring(ZombRand(1, table.length(items)+1))]);
 	--TODO: Add item vend (ka-thunk) sound; only for player
 	local objectData = object:getModData();
 	objectData.ZConomy.stock = objectData.ZConomy.stock - 1;
-	objectData.ZConomy.loot = objectData.ZConomy.loot + itemPrice;
+	objectData.ZConomy.loot = round(objectData.ZConomy.loot + itemPrice, 2);
 	object:transmitModData();
 end
 
-ZConomy.manageInventory = function(item, srcContainer, destContainer, character)
-	-- This happens after the item has been moved from src into dest
-	-- if destContainer has more than 1 money object, combine them into 1
-	if srcContainer == nil or destContainer == nil or character == nil or destContainer:contains("Money") == false then
-		return
-	end
-	local stacks = destContainer:FindAll("Money");
-	if stacks:size() < 2 then return end
-
-	local amount = 0;
-	local money;
-	-- Then add the value of each other object to the original
-	for i = 0, stacks:size() - 1 do
-		money = stacks:get(i);
-		-- If the money item doesn't have modData, roll an amount and add as if it did
-		if money:hasModData() then
-			amount = amount + tonumber(money:getModData().amount);
-		else
-			-- Only add a small amount (default cash register loot amount of $1-5.99) since we don't know the origin
-			amount = amount + tonumber(ZombRand(1, 6) .. "." .. ZombRand(0, 100));
-		end
-	end
-	-- Remove all money objects from the destination container (player inventory, usually)
-	destContainer:RemoveAll("Money");
-
-	-- Then create a new money object and set the amount to the total of the previous ones
-	ZConomy.updateMoney(destContainer:AddItem("Base.Money"), amount);
-end
-
--- ZConomy.addContainer = function(square)
--- 	local object = square:getIsoObject();
--- 	local objTexture = object:getTextureName();
--- 	local index = objTexture:find("_", -3, true);
--- 	local objTextureID = tonumber(objTexture:sub(index+1));
--- 	local objTextureName = objTexture:sub(0, index-1);
--- 	-- location_business_bank_01_[64-67] = ATMs
--- 	--NOTE location_business_bank_01_[68,69] = Bank Safe
-
--- 	if (objTexture ~= nil and
--- 			(objTextureName == "location_business_bank_01" and
--- 				(objTextureID > 63 and objTextureID < 68)
--- 			)
--- 		) then
--- 		local container = object:getContainer();
--- 		if container then
--- 			return;
--- 		end
--- 		container = ItemContainer.new("atm", square, object);
--- 		container:setExplored(true);
--- 		object:setContainer(container);
--- 		object:sendObjectChange("containers");
--- 	end
--- end
-
 Events.OnPreFillInventoryObjectContextMenu.Add(ZConomy.initInventoryContextMenu);
 Events.OnPreFillWorldObjectContextMenu.Add(ZConomy.initWorldContextMenu);
-Events.OnTransferInventoryItem.Add(ZConomy.manageInventory);
--- Events.LoadGridsquare.Add(ZConomy.addContainer);

@@ -1,0 +1,11 @@
+module Base
+{
+	sound PryOpenMachine
+	{
+		category = Player,
+		clip
+		{
+			file = media/sound/ZC_PryMachine.wav,
+		}
+	}
+}

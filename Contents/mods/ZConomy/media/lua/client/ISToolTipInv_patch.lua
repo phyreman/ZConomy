@@ -87,7 +87,7 @@ function ISToolTipInv:render()
             label = key:gsub('^%l', string.upper) .. ':';
             self.tooltip:DrawText(label, 5, ty, 1,1,0.8,1);
             -- [x = ] pad + 40 + getTextManager():MeasureStringX(UIFont.Small, label)
-            self.tooltip:DrawText(value, (self.width / 2) + 12, ty, 1,1,1,1);
+            self.tooltip:DrawText(tostring(value), (self.width / 2) + 12, ty, 1,1,1,1);
             count = count + 1;
         end
     end

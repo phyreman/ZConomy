@@ -1,0 +1,27 @@
+module Base
+{
+	model WalletEmpty
+	{
+		mesh = WorldItems/Wallet,
+		texture = WorldItems/Wallet,
+		scale = 0.6,
+	}
+	model Wallet2Empty
+	{
+		mesh = WorldItems/Wallet,
+		texture = WorldItems/Wallet2,
+		scale = 0.6,
+	}
+	model Wallet3Empty
+    {
+        mesh = WorldItems/Wallet,
+        texture = WorldItems/Wallet3,
+        scale = 0.6,
+    }
+	model Wallet4Empty
+    {
+        mesh = WorldItems/Wallet,
+        texture = WorldItems/Wallet4,
+        scale = 0.6,
+    }
+}

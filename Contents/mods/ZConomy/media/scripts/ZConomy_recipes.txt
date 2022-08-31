@@ -1,15 +1,27 @@
 module ZConomy
 {
-    imports {
-        Base
-    }
-    
-    recipe Take Money
-    {
-        Wallet/Wallet2/Wallet3/Wallet4,
+	imports {
+		Base
+	}
+	
+	recipe Take Money
+	{
+		Wallet/Wallet2/Wallet3/Wallet4,
 
-        Result:Money,
-        Time:15.0,
-        OnCreate:ZConomyMoney_OnLoot,
-    }
+		CanBeDoneFromFloor:true,
+		Result:Money,
+		Time:15.0,
+		OnCreate:ZConomyMoney_OnLoot
+	}
+
+	recipe Cut Wallet
+	{
+		WalletEmpty/Wallet2Empty/Wallet3Empty/Wallet4Empty,
+		keep [Recipe.GetItemTypes.Scissors],
+
+		Result:LeatherStrips=2,
+		Sound:ClothesRipping,
+		Time:100.0,
+		AnimNode:RipSheets
+	}
 }

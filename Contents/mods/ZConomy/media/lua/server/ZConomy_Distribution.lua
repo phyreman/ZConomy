@@ -22,7 +22,7 @@ ZConomy.AddMoneyEventHandler = function(roomName, containerType, container)
         local stacks = container:FindAll("Money");
         local loot = ZConomy.config.Loot;
         for i = 0, stacks:size()-1 do
-            ZConomy.updateMoney(stacks:get(i), ZombRand(loot.RegisterMinBills, loot.RegisterMaxBills+1) .. "." .. ZombRand(loot.RegisterMinChange, loot.RegisterMaxChange+1));
+            ZConomy.updateMoney(stacks:get(i), tonumber(ZombRand(loot.RegisterMinBills, loot.RegisterMaxBills+1) .. "." .. ZombRand(loot.RegisterMinChange, loot.RegisterMaxChange+1)));
         end
     end
     -- Add amount to money in stashes
@@ -30,7 +30,7 @@ ZConomy.AddMoneyEventHandler = function(roomName, containerType, container)
         local stacks = container:getAllTypeRecurse("Money");
         local loot = ZConomy.config.Loot;
         for i = 0, stacks:size()-1 do
-            ZConomy.updateMoney(stacks:get(i), ZombRand(loot.StashMinBills, loot.StashMaxBills+1) .. "." .. ZombRand(loot.StashMinChange, loot.StashMaxChange+1));
+            ZConomy.updateMoney(stacks:get(i), tonumber(ZombRand(loot.StashMinBills, loot.StashMaxBills+1) .. "." .. ZombRand(loot.StashMinChange, loot.StashMaxChange+1)));
         end
     end
     -- Show containers being filled when in debug mode
@@ -59,7 +59,7 @@ ZConomy.ZombieDeadEventHandler = function(zombie)
 
     local purse = zombie:getInventory():AddItem("Purse");
     local money = purse:getItemContainer():AddItem("Money");
-    ZConomy.updateMoney(money, ZombRand(loot.PurseMinBills, loot.PurseMaxBills+1) .. "." .. ZombRand(loot.PurseMinChange, loot.PurseMaxChange+1));
+    ZConomy.updateMoney(money, tonumber(ZombRand(loot.PurseMinBills, loot.PurseMaxBills+1) .. "." .. ZombRand(loot.PurseMinChange, loot.PurseMaxChange+1)));
 end
 
 -- Helper function to check if a table contains a given value

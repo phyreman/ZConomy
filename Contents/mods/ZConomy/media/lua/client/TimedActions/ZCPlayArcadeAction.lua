@@ -20,20 +20,17 @@ end
 
 function ZCPlayArcadeAction:start()
     local arcadePrice = tonumber(ZConomy.config.Prices.Arcade);
+    local player = self.character;
 
     -- Charge money
     ZConomy.addToMoney(self.money, -arcadePrice);
 
-    -- Update to new format
-    local objectData = self.object:getModData();
     -- Add the money to the machine's total
-    objectData.ZConomy.loot = objectData.ZConomy.loot + arcadePrice;
-    self.object:transmitModData();
+    ZConomy.addToLoot(self.object, arcadePrice);
     
-    --TODO: Add arcade noises, perhaps even different types
-    -- getSoundManager():PlayWorldSoundWav("ZC_ArcadeMachine", self.character:getCurrentSquare(), 1, 20, 1, false);
-    getSoundManager():PlayWorldSoundWav("ArcadeMachineAmbiance", self.object:getCurrentSquare(), 1, 20, 1, false);
-    addSound(self.character, self.x, self.y, self.z, 10, 10);
+    --TODO Replace this with something louder
+    -- player:getSquare():playSound("ArcadeMachineAmbiance");
+    addSound(player, self.x, self.y, self.z, 10, 10);
 end
 
 function ZCPlayArcadeAction:stop()
@@ -53,6 +50,7 @@ function ZCPlayArcadeAction:new(character, object, money)
     o.stopOnRun = true;
     o.character = character;
     o.bodyDamage = character:getBodyDamage();
+    o.stats = character:getStats();
     o.object = object;
     o.money = money;
     o.maxTime = 300 + (ZombRand(1,6) * 30);

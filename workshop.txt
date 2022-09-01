@@ -16,7 +16,7 @@ description=[*]Now compatible with existing saves! Just move the Money from one 
 description=[/list]
 description=
 description=[h1]Translations[/h1]
-description=This project is currently available in English, Português (by Mtzim), and Русский (by ashat_1). Community translations gladly accepted! Here are the English variants:
+description=This project is currently available in English, Portugues (by Mtzim), and Russian (by ashat_1). Community translations gladly accepted! Here are the English variants:
 description=[code]ContextMenu_EN = {
 description=    ContextMenu_BuyPop = "Buy pop",
 description=    ContextMenu_BuySnack = "Buy snack",
@@ -34,5 +34,5 @@ description=[/list]
 description=
 description=[h1]Permissions[/h1]
 description=Credit Where Due
-tags=Build 41.73;Food;Items;Multiplayer
+tags=Build 41;Food;Items;Multiplayer;Realistic
 visibility=public

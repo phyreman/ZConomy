@@ -44,7 +44,7 @@ ZConomy.ZombieDeadEventHandler = function(zombie)
 
     local loot = ZConomy.config.Loot;
     -- Floor and clamp between [0,100]
-    local chance = math.max(0, math.min(100, math.floor(loot.PurseChance)));
+    local chance = math.min(math.max(math.floor(loot.PurseChance), 0), 100);
     local rolls = {};
     local rand;
     -- Roll (0 < $chance < 100) number of times and store the numbers

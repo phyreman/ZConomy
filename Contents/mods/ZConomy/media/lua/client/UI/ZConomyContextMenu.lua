@@ -15,6 +15,7 @@ ZConomy.initInventoryContextMenu = function(_player, context, items)
 		subMenu:addOption(getText("ContextMenu_Split_Stack", 50, 50), player, ZConomy.splitMoneyStack, item, 0.5);
 		subMenu:addOption(getText("ContextMenu_Split_Stack", 75, 25), player, ZConomy.splitMoneyStack, item, 0.75);
 		subMenu:addOption(getText("ContextMenu_Split_Stack", 90, 10), player, ZConomy.splitMoneyStack, item, 0.9);
+		subMenu:addOption(getText("ContextMenu_Split_Stack_Custom"), player, ZConomy.initMoneyPrompt, item);
 		context:addSubMenu(context:addOption(getText("ContextMenu_SplitStack"), nil, nil), subMenu);
 	end
 end
@@ -35,7 +36,8 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 	-- location_shop_accessories_01_[20-23] = black registers
 	-- location_shop_accessories_01_[16,17] = snack machine
 	-- location_shop_accessories_01_[18,19] = soda machine
-	-- recreational_01_[16-24] = arcade machines
+	--NOTE Machine 26 is just the top half and 27 is the bottom half, we only want the bottom half to trigger a menu
+	-- recreational_01_[16-25,27] = arcade machines
 	-- street_decoration_01_[38,39] = payphones
 	-- location_business_bank_01_[64-67] = ATMs
 	--NOTE location_business_bank_01_[68,69] = Bank Safe
@@ -68,7 +70,7 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 				isPayphone = true;
 			end
 		elseif objTextureName == "recreational_01" then
-			if objTextureID > 15 and objTextureID < 25 then
+			if objTextureID > 15 and objTextureID < 28 and objTextureID ~= 26 then
 				isArcadeMachine = true;
 			end
 		end
@@ -105,7 +107,10 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 	end
 
 	if isVendingMachine and objectData.ZConomy.stock == nil then
-		local type = objType:gsub("^%l", string.upper);
+		local type = "Snack";
+		if objType == "pop" then
+			type = "Drink";
+		end
 		objectData.ZConomy.stock = ZombRand(config.Options[type.."StockMin"], config.Options[type.."StockMax"]+1);
 		object:transmitModData();
 	end
@@ -121,7 +126,7 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 			loot = (300 - objectData.ZConomy.stock) * tonumber(config.Prices[objType:gsub("^%l", string.upper)]);
 		end
 		if loot ~= nil then
-			ZConomy.addToLoot(objectData.ZConomy.loot, loot);
+			ZConomy.updateLoot(object, loot);
 			object:transmitModData();
 		end
 	end
@@ -165,9 +170,21 @@ ZConomy.initWorldContextMenu = function(_player, context, worldobjects)
 	end
 end
 
+ZConomy.initMoneyPrompt = function(player, money)
+	local ui = ZCMoneyPromptUI:new(0, 0, 300, 125, player, money, ZConomy.splitMoneyStackCustom);
+	ui:initialise();
+	ui:addToUIManager();
+end
+
 ZConomy.splitMoneyStack = function(player, money, delta)
 	local moneyData = money:getModData();
 	local amount = round(moneyData.amount * delta, 2);
+	local newMoney = money:getContainer():AddItem("Base.Money");
+	ZConomy.updateMoney(newMoney, amount);
+	ZConomy.addToMoney(money, -amount);
+end
+
+ZConomy.splitMoneyStackCustom = function(player, money, amount)
 	local newMoney = money:getContainer():AddItem("Base.Money");
 	ZConomy.updateMoney(newMoney, amount);
 	ZConomy.addToMoney(money, -amount);
@@ -195,8 +212,8 @@ ZConomy.checkForChange = function(object, player)
 	-- Combine money stacks
 	local inventory = player:getInventory();
 	local money = inventory:FindAndReturn("Base.Money") or inventory:AddItem("Base.Money");
-	local change = {0.25,0.5,0.75,1};
-	ZConomy.addToMoney(money, change[ZombRand(1,5)]);
+	local change = {0,0,0,0,0,0,0,0,0.25,0.25,0.25,0.25,0.25,0.25,0.5,0.5,0.5,0.75,0.75,1};
+	ZConomy.addToMoney(money, change[ZombRand(1,#change+1)]);
 
 	object:getModData().ZConomy.looted = true;
 	object:transmitModData();

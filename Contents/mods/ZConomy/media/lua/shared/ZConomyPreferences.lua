@@ -44,7 +44,7 @@ defaultSettings.Loot = {
     ["PurseMaxBills"] = 9,
     ["PurseMinChange"] = 0,
     ["PurseMaxChange"] = 99,
-    ["PurseChance"] = 2, -- Percent chance to spawn a purse on a dead female zombie (only whole numbers; default is 2)
+    ["PurseChance"] = 5, -- Percent chance to spawn a purse on a dead female zombie (only whole numbers; default is 5)
     -- Register Loot
     ["RegisterMinBills"] = 1,
     ["RegisterMaxBills"] = 5,
@@ -103,20 +103,25 @@ ZConomy.addToLoot = function(obj, amount)
     obj:transmitModData();
 end
 
+ZConomy.updateLoot = function(obj, amount)
+    local objectData = obj:getModData();
+    objectData.ZConomy.loot = round(amount, 2);
+    obj:transmitModData();
+end
+
 ZConomy.addToMoney = function(money, amount)
     local moneyData = money:getModData();
     if moneyData.amount == nil then
         moneyData.amount = 0;
     end
-    amount = round(moneyData.amount + amount, 2);
-    moneyData.amount = amount;
+    moneyData.amount = round(moneyData.amount + amount, 2);
     if moneyData.tooltip == nil then
         moneyData.tooltip = {};
     end
-    moneyData.tooltip.amount = amount;
+    moneyData.tooltip.amount = moneyData.amount;
     -- Scale the weight of a money stack depending on the amount of money held
     if ZConomy.config.Options.ScaleMoneyWeight == "true" then
-        money:setActualWeight(math.max(0.01, (amount / 0.01) * 0.0005));
+        money:setActualWeight(math.max(0.1, round((moneyData.amount / 0.01) * 0.00025, 2)));
         money:setCustomWeight(true);
     end
 end
@@ -129,7 +134,7 @@ ZConomy.updateMoney = function(money, amount)
     end
     moneyData.tooltip.amount = moneyData.amount;
     if ZConomy.config.Options.ScaleMoneyWeight == "true" then
-        money:setActualWeight(math.max(0.01, (moneyData.amount / 0.01) * 0.0005));
+        money:setActualWeight(math.max(0.1, round((moneyData.amount / 0.01) * 0.00025, 2)));
         money:setCustomWeight(true);
     end
 end

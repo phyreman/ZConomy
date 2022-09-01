@@ -24,7 +24,11 @@ description=    ContextMenu_BreakOpen = "Break open",
 description=    ContextMenu_CheckForChange = "Check for change",
 description=    ContextMenu_PlayArcadeGame = "Play arcade game",
 description=    ContextMenu_SplitStack = "Split Stack",
-description=    ContextMenu_Split_Stack = "%1/%2 (%1)"
+description=    ContextMenu_Split_Stack = "%1/%2 (%1%)",
+description=    ContextMenu_Split_Stack_Custom = "Custom Amount"
+description=}
+description=IGUI_EN = {
+description=	IGUI_EnterCustomAmount = "Enter Custom Amount"
 description=}[/code]
 description=
 description=[h1]Known Issues[/h1]
